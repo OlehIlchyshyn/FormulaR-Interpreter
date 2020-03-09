@@ -1,0 +1,15 @@
+var x = 16;
+var y = 90;
+print sin((y-1)/y);
+print pow(sqrt(x), 2); //16
+while (y <= 100) {
+  if (y == 93) {
+    print "Well done";
+    print y = y + 1;
+    print "Nice!";
+  }
+  else {
+    y = y + 1;
+    print y;
+  }
+}

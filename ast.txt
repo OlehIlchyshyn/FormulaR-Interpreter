@@ -1,0 +1,5 @@
+(var x = 16.0)
+(var y = 90.0)
+(print (call sin_1))
+(print (call pow_2))
+(while (<= y 100.0) (block (if-else (== y 93.0) (block (print Well done)(print (= y (+ y 1.0)))(print Nice!)) (block (; (= y (+ y 1.0)))(print y)))))
