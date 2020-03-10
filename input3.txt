@@ -1,0 +1,10 @@
+func sayHello() {
+  print "Hello user!";
+}
+
+func sayHello(name) {
+  print "Hello" + " " + name + "!";
+}
+
+sayHello();
+sayHello("Oleh");
