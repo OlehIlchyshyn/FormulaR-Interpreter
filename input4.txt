@@ -1,0 +1,6 @@
+var x = kvadrat(4);
+var z = 0;
+while (z < 3) {
+  print z = z + 1;
+}
+print x;

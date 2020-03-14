@@ -23,7 +23,7 @@ class Parser {
     List<Stmt> parse() throws IOException {
         List<Stmt> statements = new ArrayList<>();
         Map <String, Stmt> varStmts = new HashMap<>();
-        AstPrinter astPrinter = new AstPrinter();
+        TreeView astPrinter = new TreeView();
         PrintWriter astFile = new PrintWriter("ast.txt", StandardCharsets.UTF_8);
         while (!isAtEnd()) {
             Stmt stmt = declaration();

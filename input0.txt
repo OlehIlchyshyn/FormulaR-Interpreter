@@ -1,5 +1,10 @@
 var a = 1;
+var c = "w";
+print c;
 var b = a + 1;
 print b;
 a = 3;
 print b;
+var x = a+b+sqrt(a)+pow(b,2);
+print kvadrat(4)+2;
+print x;

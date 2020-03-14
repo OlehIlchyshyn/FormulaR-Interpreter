@@ -61,6 +61,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             @Override
             public String toString() { return "<вбудована функція sqrt>"; }
         });
+
+        globals.define("kvadrat_1", new FCallable() {
+            @Override
+            public int argsNum() { return 1; }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return Math.pow((double)arguments.get(0),2);
+            }
+
+            @Override
+            public String toString() { return "<вбудована функція kvadrat>"; }
+        });
     }
 
     void interpret(List<Stmt> statements) {
