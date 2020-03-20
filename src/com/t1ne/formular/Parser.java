@@ -27,23 +27,27 @@ class Parser {
         PrintWriter astFile = new PrintWriter("ast.txt", StandardCharsets.UTF_8);
         while (!isAtEnd()) {
             Stmt stmt = declaration();
+            astFile.println(astPrinter.print(stmt));
             String name;
             if (stmt instanceof Stmt.Var) {
                 Stmt.Var var = (Stmt.Var) stmt;
                 name = var.name.lexeme;
                 varStmts.put(name, stmt);
+                for (String key : varStmts.keySet()) {
+                    statements.add(varStmts.get(key));
+                }
             } else if (stmt instanceof Stmt.Expression) {
                 Stmt.Expression expr = (Stmt.Expression) stmt;
                 if (expr.expression instanceof Expr.Assign) {
                     Expr.Assign assign = (Expr.Assign) expr.expression;
                     name = assign.name.lexeme;
                     varStmts.put(name, stmt);
+                    for (String key : varStmts.keySet()) {
+                        statements.add(varStmts.get(key));
+                    }
                 }
-            }
-            astFile.println(astPrinter.print(stmt));
-            statements.add(stmt);
-            for (String key : varStmts.keySet()) {
-                statements.add(varStmts.get(key));
+            } else {
+                statements.add(stmt);
             }
         }
         astFile.close();

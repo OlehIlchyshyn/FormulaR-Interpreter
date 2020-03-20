@@ -1,4 +1,27 @@
-var x = 4.3;
-x = x + 1;
-print x - 1;
-var z;
+if (false) {
+  print "hi";
+}
+
+if (true) {
+  print "hi";
+}
+else {
+  print "bye";
+}
+
+if (false) {
+  print "bye";
+}
+else {
+  print "hi";
+}
+
+while (false) {
+  var i = i + 1;
+  print "why";
+}
+
+var x = 0;
+while (x < 3) {
+  print x = x + 1;
+}

@@ -1,7 +1,12 @@
 package com.t1ne.formular;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Math.pow;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     final Environment globals = new Environment();
@@ -42,7 +47,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return Math.pow((double)arguments.get(0), (double)arguments.get(1));
+                return pow((double)arguments.get(0), (double)arguments.get(1));
             }
 
             @Override
@@ -68,11 +73,76 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return Math.pow((double)arguments.get(0),2);
+                return pow((double)arguments.get(0),2);
             }
 
             @Override
             public String toString() { return "<вбудована функція kvadrat>"; }
+        });
+
+        globals.define("diffLn_1", new FCallable() {
+            @Override
+            public int argsNum() { return 1; }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return 1/Math.log((double)arguments.get(0));
+            }
+
+            @Override
+            public String toString() { return "<вбудована функція differentiatePolynomial>"; }
+        });
+
+        globals.define("diffLog_2", new FCallable() {
+            @Override
+            public int argsNum() { return 2; }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return 1/Math.log((double)arguments.get(0));
+            }
+
+            @Override
+            public String toString() { return "<вбудована функція differentiatePolynomial>"; }
+        });
+
+        globals.define("diffPolynom_2", new FCallable() {
+            @Override
+            public int argsNum() { return 2; }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                double answer = 0;
+                String nextChar = "+";
+                String formula = (String)arguments.get(0);
+                String[] parts = formula.split(" ");
+                for (String part : parts) {
+                    if (!part.equals("+") && !part.equals("-")) {
+                        StringBuilder coeffStr = new StringBuilder();
+                        int i;
+                        for (i = 0; part.charAt(i) != 'x'; i++)
+                            coeffStr.append(part.charAt(i));
+                        int coeff = Integer.parseInt(coeffStr.toString());
+                        StringBuilder powStr = new StringBuilder();
+                        for (i = i + 2; i != part.length(); i++)
+                            powStr.append(part.charAt(i));
+                        int pow = Integer.parseInt(powStr.toString());
+                        if (nextChar.equals("+"))
+                            answer += coeff * pow * pow((double) arguments.get(1), pow - 1);
+                        else
+                            answer -= coeff * pow * pow((double) arguments.get(1), pow - 1);
+                    }
+                    if (part.equals("+")) {
+                        nextChar = "+";
+                    } else if (part.equals("-")) {
+                        nextChar = "-";
+                    }
+                }
+                return answer;
+            }
+
+            @Override
+            public String toString() { return "<вбудована функція differentiatePolynomial>"; }
         });
     }
 
@@ -317,4 +387,64 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return function.call(this, arguments);
     }
 
+    public List<Stmt> optimize(List<Stmt> statements) throws IOException {
+        List<Stmt> optList = new ArrayList<>();
+        TreeView astPrinter = new TreeView();
+        PrintWriter astFile = new PrintWriter("optimization.txt", StandardCharsets.UTF_8);
+        for (Stmt stmt: statements) {
+            if (stmt instanceof Stmt.While) {
+                Stmt.While temp = (Stmt.While)stmt;
+                if (temp.condition instanceof Expr.Literal) {
+                    if (!(boolean) temp.condition.accept(this)) {
+                        astFile.println("\nBefore: ");
+                        astFile.println(astPrinter.print(stmt));
+                        astFile.println("\nAfter: ");
+                        astFile.println("Statement was removed (loop body will never execute)\n");
+                        astFile.println("/**************************************************************************/");
+                        continue;
+                    }
+                }
+                else if (temp.body instanceof Stmt.Block) {
+                    astFile.println("\nBefore: ");
+                    astFile.println(astPrinter.print(stmt));
+                    astFile.println("\nAfter: ");
+                    Stmt.Block tempBlock = (Stmt.Block) temp.body;
+                    if (tempBlock.statements.size() == 0) {
+                        astFile.println("Statement was removed (loop body is empty)\n");
+                        astFile.println("/**************************************************************************/");
+                    } else if (tempBlock.statements.size() == 1) {
+                        Stmt.While newLoop = new Stmt.While(temp.condition, tempBlock.statements.get(0));
+                        optList.add(newLoop);
+                        astFile.println(astPrinter.print(newLoop));
+                        astFile.println("/**************************************************************************/");
+                    } else {
+                        optList.add(stmt);
+                    }
+                }
+            }
+            else if (stmt instanceof Stmt.If) {
+                Stmt.If temp = (Stmt.If)stmt;
+                astFile.println("\nBefore: ");
+                astFile.println(astPrinter.print(stmt));
+                astFile.println("\nAfter: ");
+                if ((boolean)temp.condition.accept(this)) {
+                    optList.add(temp.thenBranch);
+                    astFile.println(astPrinter.print(temp.thenBranch));
+                }
+                else if (temp.elseBranch != null) {
+                    optList.add(temp.elseBranch);
+                    astFile.println(astPrinter.print(temp.elseBranch));
+                }
+                else {
+                    astFile.println("Statement was removed (condition is false and no else block provided)\n");
+                }
+                astFile.println("/**************************************************************************/");
+            }
+            else {
+                optList.add(stmt);
+            }
+        }
+        astFile.close();
+        return optList;
+    }
 }

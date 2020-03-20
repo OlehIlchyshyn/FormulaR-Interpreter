@@ -53,8 +53,15 @@ public class FormulaR {
 
         // Stop if there was a syntax error.
         if (hadError) return;
-
-        interpreter.interpret(statements);
+        for (Stmt stmt : statements) {
+            System.out.println(new TreeView().print(stmt));
+        }
+        System.out.println("..................................");
+        List<Stmt> optimizedStmtsList = interpreter.optimize(statements);
+        for (Stmt stmt : optimizedStmtsList) {
+            System.out.println(new TreeView().print(stmt));
+        }
+        interpreter.interpret(optimizedStmtsList);
     }
 
     static void error(int line, String message) {

@@ -1,28 +1,53 @@
-var
-└── =
-    ├── x
-    └── call
-        ├── kvadrat_1
-        └── args
-            └── 4.0
+if
+├── false
+└── block
+    └── print
+        └── hi
+
+if-else
+├── true
+├── block
+│   └── print
+│       └── hi
+└── block
+    └── print
+        └── bye
+
+if-else
+├── false
+├── block
+│   └── print
+│       └── bye
+└── block
+    └── print
+        └── hi
+
+while
+├── false
+└── block
+    ├── var
+    │   └── =
+    │       ├── i
+    │       └── +
+    │           ├── 1.0
+    │           └── i
+    └── print
+        └── why
 
 var
 └── =
-    ├── z
+    ├── x
     └── 0.0
 
 while
 ├── <
 │   ├── 3.0
-│   └── z
+│   └── x
 └── block
     └── print
         └── =
-            ├── z
+            ├── x
             └── +
                 ├── 1.0
-                └── z
-
-print
-└── x
+                └── x
 
